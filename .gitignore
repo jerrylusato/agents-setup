@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# npm
+node_modules/
+*.tgz
+npm-debug.log*
+
+# Local env
+.env
+.env.*

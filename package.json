@@ -1,0 +1,32 @@
+{
+  "name": "@jerrylusato/agents",
+  "version": "0.1.0",
+  "description": "Public no-clone CLI for setting up AI-agent projects and installing private IPF skills.",
+  "bin": {
+    "agents": "bin/agents.js",
+    "ipf-agents": "bin/agents.js"
+  },
+  "files": [
+    "bin/",
+    "agents_cli/*.py",
+    "README.md",
+    "LICENSE",
+    "docs/"
+  ],
+  "scripts": {
+    "test": "python -m unittest discover -s tests",
+    "smoke": "node bin/agents.js --help"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jerrylusato/agents.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jerrylusato/agents/issues"
+  },
+  "homepage": "https://github.com/jerrylusato/agents#readme"
+}
