@@ -6,6 +6,7 @@ from pathlib import Path
 
 from .paths import DEFAULT_PREFIX, default_skills_dest, default_state_file
 from .source import ResolvedSource, default_source_spec, resolve_source
+from .workflow_source import ResolvedWorkflowSource, default_workflow_source_spec, resolve_workflow_source
 from .doctor import print_doctor
 from .scaffold import print_scaffold_report, scaffold_project
 from .skills import (
@@ -21,6 +22,7 @@ from .skills import (
     uninstall_skill,
 )
 from .state import remove_state_entries, write_state
+from .workflows import describe_workflow, install_workflow, load_workflows, select_workflow
 
 
 def ensure_claude_bridge(dest_dir: Path, dry_run: bool) -> str:
@@ -171,6 +173,11 @@ def cleanup_source(resolved: ResolvedSource) -> None:
         shutil.rmtree(cleanup_dir, ignore_errors=True)
 
 
+def cleanup_workflow_source(resolved: ResolvedWorkflowSource) -> None:
+    for cleanup_dir in resolved.cleanup_dirs:
+        shutil.rmtree(cleanup_dir, ignore_errors=True)
+
+
 def load_for_args(args: argparse.Namespace) -> tuple[list[Skill], Path, str, ResolvedSource]:
     resolved = resolve_source(args.source)
     source = resolved.skills_dir
@@ -253,7 +260,56 @@ def update_command(args: argparse.Namespace) -> int:
 def init_command(args: argparse.Namespace) -> int:
     report = scaffold_project(args.root, args.dry_run)
     print_scaffold_report(report)
+    if args.workflow:
+        install_workflow_from_args(args, requested=args.workflow)
     return 0
+
+
+def workflow_list_command(args: argparse.Namespace) -> int:
+    resolved = resolve_workflow_source(args.workflow_source)
+    try:
+        workflows = load_workflows(resolved.root_dir)
+        print("Available workflows")
+        for workflow in workflows:
+            print(f"- {describe_workflow(workflow)}")
+            if workflow.description:
+                print(f"  {workflow.description}")
+        return 0
+    finally:
+        cleanup_workflow_source(resolved)
+
+
+def workflow_install_command(args: argparse.Namespace) -> int:
+    install_workflow_from_args(args, requested=args.name or "select")
+    return 0
+
+
+def install_workflow_from_args(args: argparse.Namespace, requested: str | None) -> None:
+    resolved = resolve_workflow_source(args.workflow_source)
+    try:
+        workflows = load_workflows(resolved.root_dir)
+        workflow = select_workflow(workflows, requested)
+        print(f"\nWorkflow: {describe_workflow(workflow)}")
+        if workflow.description:
+            print(workflow.description)
+        if args.dry_run:
+            print("\nDry run only. Planned workflow changes:")
+        elif not getattr(args, "yes", False):
+            answer = prompt("\nInstall this workflow into the project? [y/N]: ")
+            if answer not in {"y", "yes"}:
+                print("No workflow changes made.")
+                return
+        for message in install_workflow(
+            workflow,
+            args.root,
+            dry_run=args.dry_run,
+            run_init=not getattr(args, "no_workflow_init", False),
+        ):
+            print(message)
+        print(f"\nWorkflow directory: {args.root.expanduser().resolve() / '.agents' / 'workflows' / workflow.name}")
+        print(f"Skill directory: {args.root.expanduser().resolve() / '.agents' / 'skills' / workflow.skill_name}")
+    finally:
+        cleanup_workflow_source(resolved)
 
 
 def doctor_command(args: argparse.Namespace) -> int:
@@ -268,13 +324,26 @@ def doctor_command(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="agents-setup",
-        description="Set up projects for AI agents and install IPF skills without cloning ipf-skills.",
+        description="Set up projects for AI agents and install private skills/workflows without cloning private repos.",
     )
     subcommands = parser.add_subparsers(dest="command")
 
     init = subcommands.add_parser("init", help="Scaffold project-level agent skill discovery.")
     init.add_argument("--root", type=Path, default=Path("."), help="Project root to scaffold.")
     init.add_argument("--dry-run", action="store_true", help="Print planned changes without writing files.")
+    init.add_argument(
+        "--workflow",
+        nargs="?",
+        const="select",
+        help="Install a workflow after basic setup. Pass a workflow name, or omit the value to choose.",
+    )
+    init.add_argument(
+        "--workflow-source",
+        default=default_workflow_source_spec(),
+        help="Workflow source: local workflow repo/archive, or github-release:OWNER/REPO@TAG.",
+    )
+    init.add_argument("--yes", action="store_true", help="Confirm workflow install prompts.")
+    init.add_argument("--no-workflow-init", action="store_true", help="Copy workflow files without running its init script.")
     init.set_defaults(func=init_command)
 
     install = subcommands.add_parser("install", help="Install IPF skills globally.")
@@ -301,6 +370,30 @@ def build_parser() -> argparse.ArgumentParser:
     add_common_skill_args(doctor)
     doctor.add_argument("--root", type=Path, default=Path("."), help="Project root to inspect.")
     doctor.set_defaults(func=doctor_command)
+
+    workflow = subcommands.add_parser("workflow", help="List or install private workflow packages.")
+    workflow_subcommands = workflow.add_subparsers(dest="workflow_command")
+
+    workflow_list = workflow_subcommands.add_parser("list", help="List workflows in a source.")
+    workflow_list.add_argument(
+        "--workflow-source",
+        default=default_workflow_source_spec(),
+        help="Workflow source: local workflow repo/archive, or github-release:OWNER/REPO@TAG.",
+    )
+    workflow_list.set_defaults(func=workflow_list_command)
+
+    workflow_install = workflow_subcommands.add_parser("install", help="Install a workflow into a project.")
+    workflow_install.add_argument("name", nargs="?", help="Workflow name. Omit to choose interactively.")
+    workflow_install.add_argument("--root", type=Path, default=Path("."), help="Project root.")
+    workflow_install.add_argument("--dry-run", action="store_true", help="Print planned changes without writing files.")
+    workflow_install.add_argument(
+        "--workflow-source",
+        default=default_workflow_source_spec(),
+        help="Workflow source: local workflow repo/archive, or github-release:OWNER/REPO@TAG.",
+    )
+    workflow_install.add_argument("--yes", action="store_true", help="Confirm workflow install prompts.")
+    workflow_install.add_argument("--no-workflow-init", action="store_true", help="Copy workflow files without running its init script.")
+    workflow_install.set_defaults(func=workflow_install_command)
 
     return parser
 

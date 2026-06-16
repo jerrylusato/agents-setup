@@ -20,6 +20,7 @@ AGENTS_STUB = """# Project agent guide
 ## Skills
 
 Reusable skills live in `.agents/skills/` and are shared across all agents.
+Workflow packages live in `.agents/workflows/`.
 """
 
 
@@ -71,6 +72,7 @@ def scaffold_project(root: Path, dry_run: bool = False) -> ScaffoldReport:
     report = ScaffoldReport(root=root, dry_run=dry_run)
 
     ensure_dir(root / ".agents" / "skills", ".agents/skills (canonical skills store)", report)
+    ensure_dir(root / ".agents" / "workflows", ".agents/workflows (canonical workflows store)", report)
 
     ensure_dir(root / ".claude", ".claude", report)
     ensure_link(root / ".claude" / "skills", "../.agents/skills", ".claude/skills (Claude Code)", report)

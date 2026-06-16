@@ -40,6 +40,7 @@ def print_doctor(root: Path, skills: list[Skill], prefix: str, global_dest: Path
 
     print(f"Project: {root}")
     print(f"- .agents/skills: {_status(root / '.agents' / 'skills')}")
+    print(f"- .agents/workflows: {_status(root / '.agents' / 'workflows')}")
     print(f"- {_check_link(root / '.claude' / 'skills', '../.agents/skills')}")
     print(f"- {_check_link(root / '.junie' / 'skills', '../.agents/skills')}")
 

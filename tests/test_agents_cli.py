@@ -10,6 +10,7 @@ from pathlib import Path
 from agents_setup_cli.source import parse_github_release_spec, resolve_source, safe_extract_tar, safe_extract_zip
 from agents_setup_cli.skills import Skill, bundle_skills, installed_name
 from agents_setup_cli.cli import confirm_selection
+from agents_setup_cli.workflows import install_workflow, load_workflows
 
 
 class SourceTests(unittest.TestCase):
@@ -77,6 +78,47 @@ class CliTests(unittest.TestCase):
     def test_assume_yes_skips_prompt(self) -> None:
         skill = Skill(Path("source"), "ipf-test", "shared", "test", "")
         self.assertTrue(confirm_selection("install", [skill], dry_run=False, assume_yes=True))
+
+
+class WorkflowTests(unittest.TestCase):
+    def test_load_single_repo_workflow(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "workflow.json").write_text(
+                '{"name":"documentation-framework","title":"Docs","skill":"documentation-framework"}\n',
+                encoding="utf-8",
+            )
+            skill = root / ".agents" / "skills" / "documentation-framework"
+            skill.mkdir(parents=True)
+            (skill / "SKILL.md").write_text("---\nname: documentation-framework\n---\n", encoding="utf-8")
+
+            workflows = load_workflows(root)
+
+            self.assertEqual(len(workflows), 1)
+            self.assertEqual(workflows[0].name, "documentation-framework")
+            self.assertEqual(workflows[0].skill_name, "documentation-framework")
+
+    def test_install_workflow_copies_skill_and_workflow(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source"
+            source.mkdir()
+            (source / "workflow.json").write_text(
+                '{"name":"documentation-framework","title":"Docs","skill":"documentation-framework"}\n',
+                encoding="utf-8",
+            )
+            skill = source / ".agents" / "skills" / "documentation-framework"
+            skill.mkdir(parents=True)
+            (skill / "SKILL.md").write_text("---\nname: documentation-framework\n---\n", encoding="utf-8")
+            (source / "scripts").mkdir()
+            project = Path(tmp) / "project"
+            project.mkdir()
+
+            workflow = load_workflows(source)[0]
+            messages = install_workflow(workflow, project, dry_run=False, run_init=False)
+
+            self.assertTrue((project / ".agents" / "skills" / "documentation-framework" / "SKILL.md").is_file())
+            self.assertTrue((project / ".agents" / "workflows" / "documentation-framework" / "workflow.json").is_file())
+            self.assertTrue(any("installed skill" in message for message in messages))
 
 
 if __name__ == "__main__":
