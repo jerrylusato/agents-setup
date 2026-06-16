@@ -1,14 +1,17 @@
 # @jerrylusato/agents-setup
 
-Public no-clone CLI for setting up coding AI-agent project wiring and installing private IPF skills.
+Public no-clone CLI for setting up coding AI-agent project wiring, private IPF skills, and private workflow packages.
 
-This package is intentionally public and source-light. It does **not** bundle private skills. Skill installation fetches skills from an authenticated source, or from a local source passed with `--source`.
+This package is intentionally public and source-light. It does **not** bundle private skills or workflows. Private content is fetched from authenticated release assets, or from an explicit local source during development.
 
 ## Quick Start
 
 ```bash
 # Set up a project with .agents/skills and compatibility symlinks
 npx @jerrylusato/agents-setup init
+
+# Set up a project and install a workflow
+npx @jerrylusato/agents-setup init --workflow documentation-framework --yes
 
 # Install private skills after authenticating to GitHub
 npx @jerrylusato/agents-setup install
@@ -55,10 +58,42 @@ github-release:OWNER/REPO@latest
 /path/to/ipf-skills-<version>.zip
 ```
 
+## Private Workflow Source
+
+Default source:
+
+```text
+github-release:iPFSoftwares/workflow-contract@latest
+```
+
+Workflow setup installs two managed project folders:
+
+```text
+.agents/skills/<workflow-skill>/
+.agents/workflows/<workflow-name>/
+```
+
+Commands:
+
+```bash
+npx @jerrylusato/agents-setup workflow list
+npx @jerrylusato/agents-setup workflow install documentation-framework --yes
+npx @jerrylusato/agents-setup init --workflow documentation-framework --yes
+```
+
+For local development:
+
+```bash
+npx @jerrylusato/agents-setup workflow list \
+  --workflow-source /Users/jeremiah/Work/workflow-contract
+```
+
 ## Commands
 
 ```bash
-npx @jerrylusato/agents-setup init [--root <project>] [--dry-run]
+npx @jerrylusato/agents-setup init [--root <project>] [--workflow [name]] [--dry-run]
+npx @jerrylusato/agents-setup workflow list [--workflow-source <source>]
+npx @jerrylusato/agents-setup workflow install [name] [--root <project>] [--yes] [--dry-run]
 npx @jerrylusato/agents-setup install [--source <source>] [--bundle <name>] [--all] [--dry-run]
 npx @jerrylusato/agents-setup update [--source <source>] [--bundle <name>] [--all] [--dry-run]
 npx @jerrylusato/agents-setup uninstall [--source <source>] [--all] [--dry-run]
@@ -68,11 +103,13 @@ npx @jerrylusato/agents-setup doctor [--source <source>] [--root <project>]
 ## Security Model
 
 - The public npm package does not include private skill content.
-- Private skills are fetched only when the user runs an install/update/doctor command that needs skill metadata.
+- The public npm package does not include private workflow content.
+- Private content is fetched only when a command needs that source.
 - GitHub release downloads use the local `gh` CLI, so repository access stays governed by GitHub permissions.
 - Archives are extracted with path traversal checks before reading `SKILL.md` files.
 - Existing real files and directories are not silently overwritten during project setup.
 - Global installs only manage `ipf-*` skill directories and do not remove unrelated personal/vendor skills.
+- Workflow installs replace only their managed `.agents/skills/<name>` and `.agents/workflows/<name>` targets.
 
 ## Development
 
@@ -92,6 +129,17 @@ HOME="$TMP_HOME" node bin/agents-setup.js install \
   --all
 ```
 
+For an end-to-end local workflow test:
+
+```bash
+TMP_PROJECT=$(mktemp -d)
+node bin/agents-setup.js init \
+  --root "$TMP_PROJECT" \
+  --workflow documentation-framework \
+  --workflow-source /Users/jeremiah/Work/workflow-contract \
+  --yes
+```
+
 ## Branch And Release Model
 
 - `develop` is the integration branch. Open normal feature and fix PRs into `develop`.
@@ -103,6 +151,6 @@ HOME="$TMP_HOME" node bin/agents-setup.js install \
 The repository expects an `NPM_TOKEN` GitHub secret with permission to publish
 `@jerrylusato/agents-setup`.
 
-## Relationship to ipf-skills
+## Relationship to Private Repos
 
-`ipf-skills` remains the private canonical skill library and release-packaging source. This repo is only the public installer and project scaffold CLI.
+`ipf-skills` remains the private canonical skill library. `workflow-contract` remains the private canonical workflow package. This repo is only the public installer and project scaffold CLI.

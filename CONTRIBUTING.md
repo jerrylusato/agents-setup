@@ -1,7 +1,8 @@
 # Contributing
 
 `agents-setup` is a small public CLI. Keep changes focused, easy to review, and
-safe for machines that do not have the private `ipf-skills` repository cloned.
+safe for machines that do not have the private `ipf-skills` or
+`workflow-contract` repositories cloned.
 
 ## Branch Flow
 
@@ -33,7 +34,18 @@ HOME="$TMP_HOME" node bin/agents-setup.js install \
   --all
 ```
 
-Do not add private skill content to this repository or to npm package data.
+For behavior that touches private workflows, test with an explicit local source:
+
+```bash
+TMP_PROJECT=$(mktemp -d)
+node bin/agents-setup.js init \
+  --root "$TMP_PROJECT" \
+  --workflow documentation-framework \
+  --workflow-source /Users/jeremiah/Work/workflow-contract \
+  --yes
+```
+
+Do not add private skill or workflow content to this repository or to npm package data.
 
 ## Release Checklist
 
@@ -52,7 +64,7 @@ needs a code change, bump the version first; npm versions cannot be overwritten.
 
 - Keep this package source-light: installer code, tests, and docs only.
 - Do not commit npm tokens, GitHub tokens, private release assets, or private
-  skills.
+  skills/workflows.
 - Archive extraction logic must keep path traversal and unsafe-link tests.
 - Any change to GitHub release downloading, archive extraction, file writes, or
   uninstall behavior needs tests.
