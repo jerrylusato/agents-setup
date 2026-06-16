@@ -43,7 +43,7 @@ def write_state(
         }
 
     payload = {
-        "package": "agents",
+        "package": "@jerrylusato/agents-setup",
         "version": __version__,
         "updated_at": datetime.now(UTC).isoformat(),
         "destination": str(dest_dir.expanduser()),

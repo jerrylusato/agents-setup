@@ -7,9 +7,9 @@ import zipfile
 from io import BytesIO
 from pathlib import Path
 
-from agents_cli.source import parse_github_release_spec, resolve_source, safe_extract_tar, safe_extract_zip
-from agents_cli.skills import Skill, bundle_skills, installed_name
-from agents_cli.cli import confirm_selection
+from agents_setup_cli.source import parse_github_release_spec, resolve_source, safe_extract_tar, safe_extract_zip
+from agents_setup_cli.skills import Skill, bundle_skills, installed_name
+from agents_setup_cli.cli import confirm_selection
 
 
 class SourceTests(unittest.TestCase):

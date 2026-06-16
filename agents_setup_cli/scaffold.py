@@ -112,4 +112,4 @@ def print_scaffold_report(report: ScaffoldReport) -> None:
     if skills_dir.exists() and not any(skills_dir.iterdir()):
         print()
         print("Next: add skill folders to .agents/skills/<skill-name>/SKILL.md")
-        print("      or run `agents install` for user-level IPF skills.")
+        print("      or run `agents-setup install` for user-level IPF skills.")

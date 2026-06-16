@@ -1,21 +1,24 @@
 {
-  "name": "@jerrylusato/agents",
+  "name": "@jerrylusato/agents-setup",
   "version": "0.1.0",
-  "description": "Public no-clone CLI for setting up AI-agent projects and installing private IPF skills.",
+  "description": "Public no-clone CLI for setting up coding AI-agent projects and installing private IPF skills.",
   "bin": {
-    "agents": "bin/agents.js",
-    "ipf-agents": "bin/agents.js"
+    "agents-setup": "bin/agents-setup.js",
+    "coding-ai-agents-setup": "bin/agents-setup.js",
+    "ipf-agents-setup": "bin/agents-setup.js"
   },
   "files": [
     "bin/",
-    "agents_cli/*.py",
+    "agents_setup_cli/*.py",
     "README.md",
+    "CONTRIBUTING.md",
     "LICENSE",
     "docs/"
   ],
   "scripts": {
     "test": "python -m unittest discover -s tests",
-    "smoke": "node bin/agents.js --help"
+    "smoke": "node bin/agents-setup.js --help",
+    "packcheck": "npm pack --dry-run"
   },
   "license": "MIT",
   "engines": {
@@ -23,10 +26,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jerrylusato/agents.git"
+    "url": "git+https://github.com/jerrylusato/agents-setup.git"
   },
   "bugs": {
-    "url": "https://github.com/jerrylusato/agents/issues"
+    "url": "https://github.com/jerrylusato/agents-setup/issues"
   },
-  "homepage": "https://github.com/jerrylusato/agents#readme"
+  "homepage": "https://github.com/jerrylusato/agents-setup#readme"
 }

@@ -16,8 +16,8 @@ function findPython() {
 
 const python = findPython();
 if (!python) {
-  console.error("@jerrylusato/agents requires Python 3.10+ to run.");
-  console.error("Install Python, then rerun: npx @jerrylusato/agents --help");
+  console.error("@jerrylusato/agents-setup requires Python 3.10+ to run.");
+  console.error("Install Python, then rerun: npx @jerrylusato/agents-setup --help");
   process.exit(1);
 }
 
@@ -26,7 +26,7 @@ const env = {
   PYTHONPATH: [packageRoot, process.env.PYTHONPATH].filter(Boolean).join(path.delimiter),
 };
 
-const result = spawnSync(python, ["-m", "agents_cli", ...process.argv.slice(2)], {
+const result = spawnSync(python, ["-m", "agents_setup_cli", ...process.argv.slice(2)], {
   stdio: "inherit",
   env,
 });

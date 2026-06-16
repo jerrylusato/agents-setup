@@ -11,12 +11,12 @@ The CLI keeps private skills out of the public npm package. It installs skills b
    ```
 
 2. Attach the generated `ipf-skills-<version>.tar.gz` asset to a private GitHub Release.
-3. Publish or update `@jerrylusato/agents` only when installer behavior changes.
+3. Publish or update `@jerrylusato/agents-setup` only when installer behavior changes.
 4. Developers run:
 
    ```bash
    gh auth login
-   npx @jerrylusato/agents install
+   npx @jerrylusato/agents-setup install
    ```
 
 ## Local Testing
@@ -24,5 +24,5 @@ The CLI keeps private skills out of the public npm package. It installs skills b
 Use `--source` to avoid touching GitHub during local CLI development:
 
 ```bash
-npx @jerrylusato/agents install --source /Users/jeremiah/Work/ipf-skills/skills --bundle shared --all
+npx @jerrylusato/agents-setup install --source /Users/jeremiah/Work/ipf-skills/skills --bundle shared --all
 ```

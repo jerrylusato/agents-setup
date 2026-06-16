@@ -267,7 +267,7 @@ def doctor_command(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="agents",
+        prog="agents-setup",
         description="Set up projects for AI agents and install IPF skills without cloning ipf-skills.",
     )
     subcommands = parser.add_subparsers(dest="command")
