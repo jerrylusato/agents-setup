@@ -7,16 +7,16 @@ This package is intentionally public and source-light. It does **not** bundle pr
 ## Quick Start
 
 ```bash
-# Basic setup: agent wiring only. Does not create docs/.
+# Basic agent wiring only. No docs/ scaffold.
 npx @jerrylusato/agents-setup init
 
-# Workflow setup: agent wiring + workflow package + workflow-owned docs/.
+# Add the documentation workflow and its docs/ scaffold.
 npx @jerrylusato/agents-setup init --workflow documentation-framework --yes
 
-# Install private skills after authenticating to GitHub
+# Install private user-level skills after authenticating to GitHub.
 npx @jerrylusato/agents-setup install
 
-# Inspect project and global setup
+# Inspect project and global setup.
 npx @jerrylusato/agents-setup doctor
 ```
 
@@ -58,9 +58,9 @@ github-release:OWNER/REPO@latest
 /path/to/ipf-skills-<version>.zip
 ```
 
-## Setup Modes
+## Project Setup
 
-Basic setup creates only the agent wiring:
+Basic setup creates only agent wiring:
 
 ```text
 AGENTS.md
@@ -71,7 +71,7 @@ CLAUDE.md -> AGENTS.md
 .junie/skills -> ../.agents/skills
 ```
 
-It does not create `docs/`. Docs are workflow-owned and are created only when a workflow such as `documentation-framework` is installed.
+It does not create `docs/`. Docs are created by installed workflows, for example `documentation-framework`.
 
 ## Private Workflow Source
 
@@ -81,12 +81,14 @@ Default source:
 github-release:iPFSoftwares/workflow-contract@latest
 ```
 
-Workflow setup installs two managed project folders:
+Workflow setup installs the workflow and its skill entrypoint:
 
 ```text
 .agents/skills/<workflow-skill>/
 .agents/workflows/<workflow-name>/
 ```
+
+A workflow may also create workflow-owned project files such as `docs/`.
 
 Commands:
 
