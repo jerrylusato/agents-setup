@@ -7,10 +7,10 @@ This package is intentionally public and source-light. It does **not** bundle pr
 ## Quick Start
 
 ```bash
-# Set up a project with .agents/skills and compatibility symlinks
+# Basic setup: agent wiring only. Does not create docs/.
 npx @jerrylusato/agents-setup init
 
-# Set up a project and install a workflow
+# Workflow setup: agent wiring + workflow package + workflow-owned docs/.
 npx @jerrylusato/agents-setup init --workflow documentation-framework --yes
 
 # Install private skills after authenticating to GitHub
@@ -57,6 +57,21 @@ github-release:OWNER/REPO@latest
 /path/to/ipf-skills-<version>.tar.gz
 /path/to/ipf-skills-<version>.zip
 ```
+
+## Setup Modes
+
+Basic setup creates only the agent wiring:
+
+```text
+AGENTS.md
+CLAUDE.md -> AGENTS.md
+.agents/skills/
+.agents/workflows/
+.claude/skills -> ../.agents/skills
+.junie/skills -> ../.agents/skills
+```
+
+It does not create `docs/`. Docs are workflow-owned and are created only when a workflow such as `documentation-framework` is installed.
 
 ## Private Workflow Source
 
