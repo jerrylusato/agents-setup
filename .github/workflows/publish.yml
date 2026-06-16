@@ -47,7 +47,7 @@ jobs:
       - name: Check npm version
         id: npm
         run: |
-          if npm view "${{ steps.package.outputs.name }}@${{ steps.package.outputs.version }}" version >/dev/null 2>&1; then
+          if npm dist-tag ls "${{ steps.package.outputs.name }}" | grep -q "latest: ${{ steps.package.outputs.version }}"; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
