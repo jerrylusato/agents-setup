@@ -21,6 +21,7 @@ AGENTS_STUB = """# Project agent guide
 
 Reusable skills live in `.agents/skills/` and are shared across all agents.
 Workflow packages live in `.agents/workflows/`.
+Basic setup does not create `docs/`; docs are owned by installed workflows.
 """
 
 
@@ -115,3 +116,4 @@ def print_scaffold_report(report: ScaffoldReport) -> None:
         print()
         print("Next: add skill folders to .agents/skills/<skill-name>/SKILL.md")
         print("      or run `agents-setup install` for user-level IPF skills.")
+        print("      Basic setup does not create docs/; install a workflow to add workflow-owned docs.")

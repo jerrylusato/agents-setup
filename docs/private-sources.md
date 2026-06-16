@@ -2,6 +2,8 @@
 
 The CLI keeps private skills and workflows out of the public npm package. It resolves private content at runtime from authenticated GitHub release assets or explicit local sources.
 
+Basic `agents-setup init` is agent wiring only and does not create `docs/`. Workflow-owned docs are created only when a workflow is installed.
+
 ## Skills Release Flow
 
 1. In the private `ipf-skills` repo, build a release bundle:

@@ -328,14 +328,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subcommands = parser.add_subparsers(dest="command")
 
-    init = subcommands.add_parser("init", help="Scaffold project-level agent skill discovery.")
+    init = subcommands.add_parser(
+        "init",
+        help="Scaffold agent wiring. Docs are created only by installed workflows.",
+        description="Scaffold agent wiring only. Basic setup does not create docs/; installed workflows may create workflow-owned docs.",
+    )
     init.add_argument("--root", type=Path, default=Path("."), help="Project root to scaffold.")
     init.add_argument("--dry-run", action="store_true", help="Print planned changes without writing files.")
     init.add_argument(
         "--workflow",
         nargs="?",
         const="select",
-        help="Install a workflow after basic setup. Pass a workflow name, or omit the value to choose.",
+        help="Install a workflow after basic setup. Workflows may create workflow-owned docs/.",
     )
     init.add_argument(
         "--workflow-source",
