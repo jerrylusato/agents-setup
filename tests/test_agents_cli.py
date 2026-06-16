@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import tempfile
+import tarfile
 import unittest
+import zipfile
+from io import BytesIO
 from pathlib import Path
 
-from agents_cli.source import parse_github_release_spec, resolve_source
+from agents_cli.source import parse_github_release_spec, resolve_source, safe_extract_tar, safe_extract_zip
 from agents_cli.skills import Skill, bundle_skills, installed_name
 from agents_cli.cli import confirm_selection
 
@@ -31,6 +34,29 @@ class SourceTests(unittest.TestCase):
             (skills / "SKILL.md").write_text("---\nname: demo\ndescription: Demo\n---\n", encoding="utf-8")
             resolved = resolve_source(tmp)
             self.assertEqual(resolved.skills_dir, (Path(tmp) / "ipf-skills-v1" / "skills").resolve())
+
+    def test_rejects_unsafe_tar_path(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            archive_path = Path(tmp) / "bad.tar.gz"
+            with tarfile.open(archive_path, "w:gz") as archive:
+                payload = b"bad"
+                info = tarfile.TarInfo("../evil")
+                info.size = len(payload)
+                archive.addfile(info, BytesIO(payload))
+
+            with tarfile.open(archive_path, "r:gz") as archive:
+                with self.assertRaises(SystemExit):
+                    safe_extract_tar(archive, Path(tmp) / "out")
+
+    def test_rejects_unsafe_zip_path(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            archive_path = Path(tmp) / "bad.zip"
+            with zipfile.ZipFile(archive_path, "w") as archive:
+                archive.writestr("../evil", "bad")
+
+            with zipfile.ZipFile(archive_path) as archive:
+                with self.assertRaises(SystemExit):
+                    safe_extract_zip(archive, Path(tmp) / "out")
 
 
 class SkillTests(unittest.TestCase):
