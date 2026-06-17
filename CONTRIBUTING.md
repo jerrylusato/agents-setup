@@ -4,15 +4,19 @@
 safe for machines that do not have the private `ipf-skills` or
 `workflow-contract` repositories cloned.
 
-## Branch Flow
+## Branch and Release Flow
 
-- Open feature and fix pull requests into `develop`.
-- Keep `develop` deployable, but treat it as the soak/integration branch.
-- Merge `develop` into `main` only when a release is ready.
-- Publishing happens from `main`, not from feature branches or `develop`.
+This repository follows GitHub Flow:
 
-This keeps normal contribution work away from the public npm release path while
-still making releases simple and auditable.
+- `main` is the only long-lived branch and should always be releasable.
+- Create short-lived feature and fix branches from `main`.
+- Open pull requests into `main`; do not use `develop` for normal work.
+- CI runs on pull requests and pushes to `main`.
+- Publishing happens from `main` after merge and only when `package.json` has a
+  version that does not already exist on npm.
+
+Keep changes focused and include tests for behavior that touches downloads,
+archive extraction, file writes, workflow setup, or uninstall logic.
 
 ## Local Checks
 
@@ -49,13 +53,10 @@ Do not add private skill or workflow content to this repository or to npm packag
 
 ## Release Checklist
 
-1. Merge feature PRs into `develop`.
-2. Let `develop` run for review/testing.
-3. Bump `package.json` when releasing a new npm version.
-4. Open a PR from `develop` to `main`.
-5. Confirm CI passes.
-6. Merge to `main`.
-7. The `Publish` workflow publishes to npm using the `NPM_TOKEN` repository secret.
+1. Bump `package.json` in the feature PR when releasing a new npm version.
+2. Confirm unit tests, launcher smoke tests, and `npm pack --dry-run` pass.
+3. Merge the PR into `main`.
+4. The `Publish` workflow publishes to npm using the `NPM_TOKEN` repository secret.
 
 The publish workflow skips a version that already exists on npm. If a release
 needs a code change, bump the version first; npm versions cannot be overwritten.

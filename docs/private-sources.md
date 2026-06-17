@@ -6,6 +6,8 @@ Basic `agents-setup init` is agent wiring only and does not create `docs/`. Work
 
 ## Skills Release Flow
 
+Skill releases are cut from `ipf-skills` `main` after PR merge.
+
 1. In the private `ipf-skills` repo, build a release bundle:
 
    ```bash
@@ -22,6 +24,8 @@ Basic `agents-setup init` is agent wiring only and does not create `docs/`. Work
    ```
 
 ## Workflow Release Flow
+
+Workflow releases are cut from `workflow-contract` `main` after PR merge.
 
 1. In the private `workflow-contract` repo, build a workflow bundle:
 

@@ -159,11 +159,13 @@ node bin/agents-setup.js init \
 
 ## Branch And Release Model
 
-- `develop` is the integration branch. Open normal feature and fix PRs into `develop`.
-- `main` is the release branch. Only merge `develop` into `main` when the package is ready to publish.
-- CI runs on PRs and pushes to both `develop` and `main`.
+This repository follows GitHub Flow:
+
+- `main` is the only long-lived branch and should always be releasable.
+- Open short-lived feature and fix pull requests into `main`.
+- CI runs on PRs and pushes to `main`.
 - The npm publish workflow runs only on `main` and skips if the version already exists.
-- Package versions are immutable on npm, so bump `package.json` before merging a release PR to `main`.
+- Package versions are immutable on npm, so bump `package.json` in the PR before merging a release.
 
 The repository expects an `NPM_TOKEN` GitHub secret with permission to publish
 `@jerrylusato/agents-setup`.
