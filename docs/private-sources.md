@@ -34,7 +34,7 @@ Basic `agents-setup init` is agent wiring only and does not create `docs/`. Work
 
    ```bash
    gh auth login
-   npx @jerrylusato/agents-setup init --workflow documentation-framework --yes
+   npx @jerrylusato/agents-setup init --workflow workflow-contract --yes
    ```
 
 ## Local Testing

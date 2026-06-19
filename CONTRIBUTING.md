@@ -40,7 +40,7 @@ For behavior that touches private workflows, test with an explicit local source:
 TMP_PROJECT=$(mktemp -d)
 node bin/agents-setup.js init \
   --root "$TMP_PROJECT" \
-  --workflow documentation-framework \
+  --workflow workflow-contract \
   --workflow-source /Users/jeremiah/Work/workflow-contract \
   --yes
 ```

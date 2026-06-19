@@ -11,7 +11,7 @@ This package is intentionally public and source-light. It does **not** bundle pr
 npx @jerrylusato/agents-setup init
 
 # Add the documentation workflow and its docs/ scaffold.
-npx @jerrylusato/agents-setup init --workflow documentation-framework --yes
+npx @jerrylusato/agents-setup init --workflow workflow-contract --yes
 
 # Install private user-level skills after authenticating to GitHub.
 npx @jerrylusato/agents-setup install
@@ -71,7 +71,7 @@ CLAUDE.md -> AGENTS.md
 .junie/skills -> ../.agents/skills
 ```
 
-It does not create `docs/`. Docs are created by installed workflows, for example `documentation-framework`.
+It does not create `docs/`. Docs are created by installed workflows, for example `workflow-contract`.
 
 ## Private Workflow Source
 
@@ -94,8 +94,8 @@ Commands:
 
 ```bash
 npx @jerrylusato/agents-setup workflow list
-npx @jerrylusato/agents-setup workflow install documentation-framework --yes
-npx @jerrylusato/agents-setup init --workflow documentation-framework --yes
+npx @jerrylusato/agents-setup workflow install workflow-contract --yes
+npx @jerrylusato/agents-setup init --workflow workflow-contract --yes
 ```
 
 For local development:
@@ -152,7 +152,7 @@ For an end-to-end local workflow test:
 TMP_PROJECT=$(mktemp -d)
 node bin/agents-setup.js init \
   --root "$TMP_PROJECT" \
-  --workflow documentation-framework \
+  --workflow workflow-contract \
   --workflow-source /Users/jeremiah/Work/workflow-contract \
   --yes
 ```
