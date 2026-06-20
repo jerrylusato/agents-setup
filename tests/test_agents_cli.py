@@ -85,30 +85,30 @@ class WorkflowTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "workflow.json").write_text(
-                '{"name":"documentation-framework","title":"Docs","skill":"documentation-framework"}\n',
+                '{"name":"workflow-contract","title":"Docs","skill":"workflow-contract"}\n',
                 encoding="utf-8",
             )
-            skill = root / ".agents" / "skills" / "documentation-framework"
+            skill = root / ".agents" / "skills" / "workflow-contract"
             skill.mkdir(parents=True)
-            (skill / "SKILL.md").write_text("---\nname: documentation-framework\n---\n", encoding="utf-8")
+            (skill / "SKILL.md").write_text("---\nname: workflow-contract\n---\n", encoding="utf-8")
 
             workflows = load_workflows(root)
 
             self.assertEqual(len(workflows), 1)
-            self.assertEqual(workflows[0].name, "documentation-framework")
-            self.assertEqual(workflows[0].skill_name, "documentation-framework")
+            self.assertEqual(workflows[0].name, "workflow-contract")
+            self.assertEqual(workflows[0].skill_name, "workflow-contract")
 
     def test_install_workflow_copies_skill_and_workflow(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             source = Path(tmp) / "source"
             source.mkdir()
             (source / "workflow.json").write_text(
-                '{"name":"documentation-framework","title":"Docs","skill":"documentation-framework"}\n',
+                '{"name":"workflow-contract","title":"Docs","skill":"workflow-contract"}\n',
                 encoding="utf-8",
             )
-            skill = source / ".agents" / "skills" / "documentation-framework"
+            skill = source / ".agents" / "skills" / "workflow-contract"
             skill.mkdir(parents=True)
-            (skill / "SKILL.md").write_text("---\nname: documentation-framework\n---\n", encoding="utf-8")
+            (skill / "SKILL.md").write_text("---\nname: workflow-contract\n---\n", encoding="utf-8")
             (source / "scripts").mkdir()
             project = Path(tmp) / "project"
             project.mkdir()
@@ -116,8 +116,8 @@ class WorkflowTests(unittest.TestCase):
             workflow = load_workflows(source)[0]
             messages = install_workflow(workflow, project, dry_run=False, run_init=False)
 
-            self.assertTrue((project / ".agents" / "skills" / "documentation-framework" / "SKILL.md").is_file())
-            self.assertTrue((project / ".agents" / "workflows" / "documentation-framework" / "workflow.json").is_file())
+            self.assertTrue((project / ".agents" / "skills" / "workflow-contract" / "SKILL.md").is_file())
+            self.assertTrue((project / ".agents" / "workflows" / "workflow-contract" / "workflow.json").is_file())
             self.assertTrue(any("installed skill" in message for message in messages))
 
 

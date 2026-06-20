@@ -38,7 +38,7 @@ Workflow releases are cut from `workflow-contract` `main` after PR merge.
 
    ```bash
    gh auth login
-   npx @jerrylusato/agents-setup init --workflow documentation-framework --yes
+   npx @jerrylusato/agents-setup init --workflow workflow-contract --yes
    ```
 
 ## Local Testing
