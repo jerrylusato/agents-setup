@@ -9,6 +9,7 @@ The npm package does not include private skill or workflow content. Private cont
 ## Requirements
 
 - Node.js `>=18`
+- Python `>=3.10`
 - GitHub CLI (`gh`) authenticated with an account that can access the private source repositories:
 
   ```bash
@@ -31,10 +32,11 @@ npx @jerrylusato/agents-setup install
 npx @jerrylusato/agents-setup doctor
 ```
 
-Installed binary:
+Optional global installation:
 
 ```bash
-agents-setup
+npm install --global @jerrylusato/agents-setup
+agents-setup --help
 ```
 
 ## What `init` creates
@@ -80,7 +82,7 @@ npx @jerrylusato/agents-setup install [--source <source>] [--dest <dir>] [--pref
 npx @jerrylusato/agents-setup update [--source <source>] [--dest <dir>] [--prefix <prefix>] [--bundle <name>] [--all] [--dry-run] [--no-claude-link]
 npx @jerrylusato/agents-setup uninstall [--source <source>] [--dest <dir>] [--prefix <prefix>] [--all] [--dry-run]
 
-npx @jerrylusato/agents-setup doctor [--root <project>] [--source <source>] [--dest <dir>] [--prefix <prefix>]
+npx @jerrylusato/agents-setup doctor [--root <project>] [--source <source>] [--dest <dir>] [--prefix <prefix>] [--dry-run]
 ```
 
 Use `--help` on any command for the exact option list.
