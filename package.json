@@ -1,11 +1,9 @@
 {
   "name": "@jerrylusato/agents-setup",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Public no-clone CLI for setting up coding AI-agent projects, private skills, and private workflows.",
   "bin": {
-    "agents-setup": "bin/agents-setup.js",
-    "coding-ai-agents-setup": "bin/agents-setup.js",
-    "ipf-agents-setup": "bin/agents-setup.js"
+    "agents-setup": "bin/agents-setup.js"
   },
   "files": [
     "bin/",

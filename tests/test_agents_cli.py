@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tempfile
 import tarfile
 import unittest
@@ -11,6 +12,14 @@ from agents_setup_cli.source import parse_github_release_spec, resolve_source, s
 from agents_setup_cli.skills import Skill, bundle_skills, installed_name
 from agents_setup_cli.cli import confirm_selection
 from agents_setup_cli.workflows import install_workflow, load_workflows
+
+
+class PackageMetadataTests(unittest.TestCase):
+    def test_exposes_only_agents_setup_binary(self) -> None:
+        package_path = Path(__file__).resolve().parents[1] / "package.json"
+        package = json.loads(package_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(package["bin"], {"agents-setup": "bin/agents-setup.js"})
 
 
 class SourceTests(unittest.TestCase):

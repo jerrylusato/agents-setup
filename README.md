@@ -31,12 +31,10 @@ npx @jerrylusato/agents-setup install
 npx @jerrylusato/agents-setup doctor
 ```
 
-Installed binary names:
+Installed binary:
 
 ```bash
 agents-setup
-coding-ai-agents-setup
-ipf-agents-setup
 ```
 
 ## What `init` creates
