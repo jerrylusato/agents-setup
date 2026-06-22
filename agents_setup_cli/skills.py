@@ -25,6 +25,7 @@ class Skill:
     department: str
     label: str
     description: str
+    exact_install_name: bool = False
 
     def target(self, dest_dir: Path) -> Path:
         return dest_dir / self.destination_name
@@ -34,7 +35,28 @@ def find_skill_dirs(source: Path) -> list[Path]:
     return sorted(path.parent for path in source.rglob("SKILL.md"))
 
 
+def read_frontmatter_scalar(skill_dir: Path, key: str) -> str:
+    skill_file = skill_dir / "SKILL.md"
+    if not skill_file.is_file():
+        return ""
+
+    lines = skill_file.read_text(encoding="utf-8").splitlines()
+    if not lines or lines[0] != "---":
+        return ""
+
+    prefix = f"{key}:"
+    for line in lines[1:]:
+        if line == "---":
+            break
+        if line.startswith(prefix):
+            return line.removeprefix(prefix).strip().strip('"\'')
+    return ""
+
+
 def installed_name(skill_dir: Path, prefix: str = DEFAULT_PREFIX) -> str:
+    exact_name = read_frontmatter_scalar(skill_dir, "install_name")
+    if exact_name:
+        return exact_name
     source_name = skill_dir.name
     if prefix and not source_name.startswith(f"{prefix}-"):
         return f"{prefix}-{source_name}"
@@ -92,6 +114,7 @@ def build_skills(skill_dirs: list[Path], source: Path, prefix: str = DEFAULT_PRE
             department=department_name(skill_dir, source),
             label=display_label(skill_dir, source),
             description=read_frontmatter_description(skill_dir),
+            exact_install_name=bool(read_frontmatter_scalar(skill_dir, "install_name")),
         )
         for skill_dir in skill_dirs
     ]
@@ -170,6 +193,11 @@ def install_skill(skill: Skill, dest_dir: Path, replace: bool, dry_run: bool) ->
     if target.exists() or target.is_symlink():
         if not replace:
             return f"skip    {target.name} already exists"
+        if skill.exact_install_name and read_frontmatter_scalar(target, "install_name") != skill.destination_name:
+            raise SystemExit(
+                f"Refusing to replace unmanaged canonical skill: {target}. "
+                "Remove or rename it explicitly, then retry."
+            )
         if not dry_run:
             remove_existing(target)
 
