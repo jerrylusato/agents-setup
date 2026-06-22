@@ -82,6 +82,14 @@ class SkillTests(unittest.TestCase):
         ]
         self.assertEqual([s.destination_name for s in bundle_skills(skills, "frontend")], ["ipf-shared", "ipf-front"])
 
+    def test_bundle_filters_shared_and_devops(self) -> None:
+        skills = [
+            Skill(Path("a"), "ipf-shared", "shared", "shared", ""),
+            Skill(Path("b"), "ipf-devops", "devops", "devops", ""),
+            Skill(Path("c"), "ipf-back", "backend", "back", ""),
+        ]
+        self.assertEqual([s.destination_name for s in bundle_skills(skills, "devops")], ["ipf-shared", "ipf-devops"])
+
 
 class CliTests(unittest.TestCase):
     def test_assume_yes_skips_prompt(self) -> None:
