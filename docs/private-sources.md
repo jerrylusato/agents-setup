@@ -8,6 +8,12 @@ Basic `agents-setup init` is agent wiring only and does not create `docs/`. Work
 
 Skill releases are cut from `ipf-skills` `main` after PR merge.
 
+Skills receive the configured `ipf-` prefix by default. A trusted skill may
+declare an exact `install_name` in its `SKILL.md` frontmatter when it is intended
+to provide a canonical unprefixed user-level standard, such as `commit`. Exact
+names are included in duplicate-name checks before installation. The installer
+refuses to replace an existing unmanaged skill at that name.
+
 1. In the private `ipf-skills` repo, build a release bundle:
 
    ```bash

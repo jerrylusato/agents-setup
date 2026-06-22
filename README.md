@@ -127,7 +127,11 @@ npx @jerrylusato/agents-setup init \
 
 - Existing real files and directories are left untouched during project setup.
 - Workflow installs replace only their managed `.agents/skills/<workflow-skill>` and `.agents/workflows/<workflow-name>` targets.
-- Skill installs manage only the selected destination and `ipf-*` skill names by default.
+- Skill installs manage only the selected destination, `ipf-*` skill names by
+  default, and explicit canonical names declared by trusted skill sources with
+  `install_name` frontmatter.
+- Existing unmanaged skills at an exact canonical name are never replaced;
+  remove or rename the conflict explicitly before installing.
 - Archive extraction rejects path traversal and link entries.
 - GitHub release downloads use the local `gh` authentication state.
 
