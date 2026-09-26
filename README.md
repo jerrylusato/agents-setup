@@ -59,7 +59,7 @@ It does not create `docs/`. Workflow-owned files, including `docs/`, are created
 Skills:
 
 ```text
-github-release:iPFSoftwares/ipf-skills@latest
+github-release:iPFSoftwares/skills@latest
 ```
 
 Workflows:
@@ -113,7 +113,7 @@ Local examples:
 
 ```bash
 npx @jerrylusato/agents-setup install \
-  --source /Users/jeremiah/Work/ipf-skills/skills \
+  --source /path/to/skills/skills \
   --bundle shared \
   --all
 
@@ -159,5 +159,5 @@ NPM_TOKEN
 
 ## Related private repositories
 
-- `iPFSoftwares/ipf-skills`: canonical private skill source.
+- `iPFSoftwares/skills`: canonical private skill source.
 - `iPFSoftwares/workflow-contract`: canonical private workflow source.
