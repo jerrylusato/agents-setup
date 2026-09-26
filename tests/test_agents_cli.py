@@ -8,7 +8,13 @@ import zipfile
 from io import BytesIO
 from pathlib import Path
 
-from agents_setup_cli.source import parse_github_release_spec, resolve_source, safe_extract_tar, safe_extract_zip
+from agents_setup_cli.source import (
+    DEFAULT_SKILLS_SOURCE,
+    parse_github_release_spec,
+    resolve_source,
+    safe_extract_tar,
+    safe_extract_zip,
+)
 from agents_setup_cli.skills import Skill, bundle_skills, installed_name
 from agents_setup_cli.cli import confirm_selection
 from agents_setup_cli.workflows import install_workflow, load_workflows
@@ -23,10 +29,13 @@ class PackageMetadataTests(unittest.TestCase):
 
 
 class SourceTests(unittest.TestCase):
+    def test_default_skills_source_uses_renamed_repository(self) -> None:
+        self.assertEqual(DEFAULT_SKILLS_SOURCE, "github-release:iPFSoftwares/skills@latest")
+
     def test_parse_github_release_spec(self) -> None:
         self.assertEqual(
-            parse_github_release_spec("github-release:iPFSoftwares/ipf-skills@latest"),
-            ("iPFSoftwares/ipf-skills", "latest"),
+            parse_github_release_spec("github-release:iPFSoftwares/skills@latest"),
+            ("iPFSoftwares/skills", "latest"),
         )
 
     def test_resolve_local_skills_dir(self) -> None:

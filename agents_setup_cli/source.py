@@ -9,7 +9,7 @@ import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 
-DEFAULT_SKILLS_SOURCE = "github-release:iPFSoftwares/ipf-skills@latest"
+DEFAULT_SKILLS_SOURCE = "github-release:iPFSoftwares/skills@latest"
 ENV_SOURCE = "IPF_AGENTS_SKILLS_SOURCE"
 
 
