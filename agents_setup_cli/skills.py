@@ -10,6 +10,7 @@ from .paths import DEFAULT_PREFIX
 
 BUNDLES: dict[str, set[str]] = {
     "shared": {"shared"},
+    "devops": {"shared", "devops"},
     "frontend": {"shared", "frontend"},
     "backend": {"shared", "backend"},
     "mobile": {"shared", "mobile"},
