@@ -95,6 +95,16 @@ class SkillTests(unittest.TestCase):
 
             self.assertEqual(installed_name(skill, "ipf"), "commit")
 
+    def test_invalid_exact_name_is_rejected_before_building_target(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            skill = Path(tmp) / "commit"
+            skill.mkdir()
+            skill_file = skill / "SKILL.md"
+            for value in ("../personal", "commit/other", "bad_name", ""):
+                skill_file.write_text(f"---\nname: commit\ninstall_name: {value}\n---\n", encoding="utf-8")
+                with self.subTest(value=value), self.assertRaisesRegex(SystemExit, "Invalid install_name"):
+                    installed_name(skill, "ipf")
+
     def test_build_skills_marks_exact_install_name(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             source = Path(tmp) / "skills"

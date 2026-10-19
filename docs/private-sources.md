@@ -16,6 +16,8 @@ writes `.ipf-skill-owner.json` inside an exact-name install and verifies its
 owner and name before replacement or uninstall. Unmarked or mismatched
 directories, and symlinks at an exact name, are left alone. There is no
 automatic adoption of an existing personal `commit` skill.
+Exact names must be nonempty lowercase kebab-case; invalid values are rejected
+before the installer constructs a destination path.
 
 1. In the private `skills` repo, build a release bundle:
 

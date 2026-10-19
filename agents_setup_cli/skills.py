@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import textwrap
 from dataclasses import dataclass
@@ -10,6 +11,7 @@ from .paths import DEFAULT_PREFIX
 
 OWNER_MARKER = ".ipf-skill-owner.json"
 OWNER_ID = "iPFSoftwares/skills"
+INSTALL_NAME_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 
 
 BUNDLES: dict[str, set[str]] = {
@@ -45,14 +47,14 @@ def find_skill_dirs(source: Path) -> list[Path]:
     return sorted(path.parent for path in source.rglob("SKILL.md"))
 
 
-def read_frontmatter_scalar(skill_dir: Path, key: str) -> str:
+def read_frontmatter_scalar(skill_dir: Path, key: str) -> str | None:
     skill_file = skill_dir / "SKILL.md"
     if not skill_file.is_file():
-        return ""
+        return None
 
     lines = skill_file.read_text(encoding="utf-8").splitlines()
     if not lines or lines[0] != "---":
-        return ""
+        return None
 
     prefix = f"{key}:"
     for line in lines[1:]:
@@ -60,12 +62,14 @@ def read_frontmatter_scalar(skill_dir: Path, key: str) -> str:
             break
         if line.startswith(prefix):
             return line.removeprefix(prefix).strip().strip('"\'')
-    return ""
+    return None
 
 
 def installed_name(skill_dir: Path, prefix: str = DEFAULT_PREFIX) -> str:
     exact_name = read_frontmatter_scalar(skill_dir, "install_name")
-    if exact_name:
+    if exact_name is not None:
+        if not INSTALL_NAME_RE.fullmatch(exact_name):
+            raise SystemExit(f"Invalid install_name in {skill_dir / 'SKILL.md'}: expected a kebab-case directory name")
         return exact_name
     source_name = skill_dir.name
     if prefix and not source_name.startswith(f"{prefix}-"):
@@ -124,7 +128,7 @@ def build_skills(skill_dirs: list[Path], source: Path, prefix: str = DEFAULT_PRE
             department=department_name(skill_dir, source),
             label=display_label(skill_dir, source),
             description=read_frontmatter_description(skill_dir),
-            exact_install_name=bool(read_frontmatter_scalar(skill_dir, "install_name")),
+            exact_install_name=read_frontmatter_scalar(skill_dir, "install_name") is not None,
         )
         for skill_dir in skill_dirs
     ]
