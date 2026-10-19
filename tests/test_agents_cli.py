@@ -7,6 +7,7 @@ import unittest
 import zipfile
 from io import BytesIO
 from pathlib import Path
+from unittest.mock import patch
 
 from agents_setup_cli.source import (
     DEFAULT_SKILLS_SOURCE,
@@ -15,8 +16,8 @@ from agents_setup_cli.source import (
     safe_extract_tar,
     safe_extract_zip,
 )
-from agents_setup_cli.skills import Skill, build_skills, bundle_skills, install_skill, installed_name
-from agents_setup_cli.cli import confirm_selection
+from agents_setup_cli.skills import Skill, build_skills, bundle_skills, install_skill, installed_name, uninstall_skill
+from agents_setup_cli.cli import confirm_selection, main
 from agents_setup_cli.workflows import install_workflow, load_workflows
 
 
@@ -130,6 +131,46 @@ class SkillTests(unittest.TestCase):
             with self.assertRaisesRegex(SystemExit, "Refusing to replace unmanaged canonical skill"):
                 install_skill(skill, dest, replace=True, dry_run=False)
 
+            self.assertIn("unmanaged", uninstall_skill(skill, dest, dry_run=False).message)
+            self.assertTrue((existing / "SKILL.md").exists())
+
+    def test_canonical_install_marks_ownership_for_replace_and_uninstall(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "source" / "commit"
+            source.mkdir(parents=True)
+            (source / "SKILL.md").write_text(
+                "---\nname: commit\ninstall_name: commit\ndescription: Canonical\n---\n",
+                encoding="utf-8",
+            )
+            dest = root / "dest"
+            dest.mkdir()
+            skill = Skill(source, "commit", "shared", "commit", "Canonical", True)
+
+            self.assertTrue(install_skill(skill, dest, replace=True, dry_run=False).changed)
+            marker = json.loads((dest / "commit" / ".ipf-skill-owner.json").read_text(encoding="utf-8"))
+            self.assertEqual(marker, {"owner": "iPFSoftwares/skills", "name": "commit"})
+            self.assertTrue(install_skill(skill, dest, replace=True, dry_run=False).changed)
+            self.assertTrue(uninstall_skill(skill, dest, dry_run=False).changed)
+            self.assertFalse((dest / "commit").exists())
+
+    def test_canonical_uninstall_leaves_mismatched_marker_and_symlink(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            dest = root / "dest"
+            target = dest / "commit"
+            target.mkdir(parents=True)
+            (target / ".ipf-skill-owner.json").write_text(
+                '{"owner":"iPFSoftwares/skills","name":"other"}\n', encoding="utf-8"
+            )
+            skill = Skill(root / "source", "commit", "shared", "commit", "Canonical", True)
+
+            self.assertFalse(uninstall_skill(skill, dest, dry_run=False).changed)
+            target.rename(dest / "personal")
+            target.symlink_to(dest / "personal", target_is_directory=True)
+            self.assertFalse(uninstall_skill(skill, dest, dry_run=False).changed)
+            self.assertTrue(target.is_symlink())
+
     def test_bundle_filters_shared_and_frontend(self) -> None:
         skills = [
             Skill(Path("a"), "ipf-shared", "shared", "shared", ""),
@@ -143,6 +184,35 @@ class CliTests(unittest.TestCase):
     def test_assume_yes_skips_prompt(self) -> None:
         skill = Skill(Path("source"), "ipf-test", "shared", "test", "")
         self.assertTrue(confirm_selection("install", [skill], dry_run=False, assume_yes=True))
+
+    def test_canonical_cli_state_tracks_only_owned_install_and_removal(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "skills" / "shared" / "commit"
+            source.mkdir(parents=True)
+            (source / "SKILL.md").write_text(
+                "---\nname: commit\ninstall_name: commit\ndescription: Canonical\n---\n",
+                encoding="utf-8",
+            )
+            dest = root / "dest"
+            dest.mkdir()
+            state = root / "state.json"
+            base_args = ["--source", str(root / "skills"), "--dest", str(dest), "--all"]
+
+            with patch("agents_setup_cli.cli.default_state_file", return_value=state):
+                self.assertEqual(main(["install", *base_args, "--no-claude-link"]), 0)
+                self.assertEqual([item["name"] for item in json.loads(state.read_text())["installed_skills"]], ["commit"])
+
+                marker = dest / "commit" / ".ipf-skill-owner.json"
+                marker.unlink()
+                self.assertEqual(main(["uninstall", *base_args]), 0)
+                self.assertTrue((dest / "commit").exists())
+                self.assertEqual([item["name"] for item in json.loads(state.read_text())["installed_skills"]], ["commit"])
+
+                marker.write_text('{"owner":"iPFSoftwares/skills","name":"commit"}\n', encoding="utf-8")
+                self.assertEqual(main(["uninstall", *base_args]), 0)
+                self.assertFalse((dest / "commit").exists())
+                self.assertEqual(json.loads(state.read_text())["installed_skills"], [])
 
 
 class WorkflowTests(unittest.TestCase):

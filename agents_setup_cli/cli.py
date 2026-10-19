@@ -196,14 +196,19 @@ def install_command(args: argparse.Namespace) -> int:
         if not args.dry_run:
             dest.mkdir(parents=True, exist_ok=True)
 
+        installed: list[Skill] = []
         for skill in selected:
-            print(install_skill(skill, dest, not args.no_replace, args.dry_run))
+            result = install_skill(skill, dest, not args.no_replace, args.dry_run)
+            print(result.message)
+            if result.changed:
+                installed.append(skill)
 
         claude_bridge = "skipped"
         if not args.no_claude_link:
             claude_bridge = ensure_claude_bridge(dest, args.dry_run)
 
-        write_state(default_state_file(), dest_dir=dest, installed=selected, claude_bridge=claude_bridge, dry_run=args.dry_run)
+        if installed:
+            write_state(default_state_file(), dest_dir=dest, installed=installed, claude_bridge=claude_bridge, dry_run=args.dry_run)
         print(f"\nSkills directory: {dest.expanduser()}")
         print("Restart your agent (Codex, Claude Code, Cursor, Gemini CLI, Copilot, Windsurf, ...) to pick up skill changes.")
         return 0
@@ -218,9 +223,13 @@ def uninstall_command(args: argparse.Namespace) -> int:
         selected = select_skills("uninstall", skills, dest, prefix, args.all)
         if not confirm_selection("uninstall", selected, args.dry_run, args.all):
             return 0
+        removed: list[Skill] = []
         for skill in selected:
-            print(uninstall_skill(skill, dest, args.dry_run))
-        remove_state_entries(default_state_file(), selected, args.dry_run)
+            result = uninstall_skill(skill, dest, args.dry_run)
+            print(result.message)
+            if result.changed:
+                removed.append(skill)
+        remove_state_entries(default_state_file(), removed, args.dry_run)
         print(f"\nSkills directory: {dest.expanduser()}")
         return 0
     finally:
@@ -248,10 +257,15 @@ def update_command(args: argparse.Namespace) -> int:
             return 0
         if not args.dry_run:
             dest.mkdir(parents=True, exist_ok=True)
+        updated: list[Skill] = []
         for skill in selected:
-            print(install_skill(skill, dest, True, args.dry_run))
+            result = install_skill(skill, dest, True, args.dry_run)
+            print(result.message)
+            if result.changed:
+                updated.append(skill)
         claude_bridge = "skipped" if args.no_claude_link else ensure_claude_bridge(dest, args.dry_run)
-        write_state(default_state_file(), dest_dir=dest, installed=selected, claude_bridge=claude_bridge, dry_run=args.dry_run)
+        if updated:
+            write_state(default_state_file(), dest_dir=dest, installed=updated, claude_bridge=claude_bridge, dry_run=args.dry_run)
         return 0
     finally:
         cleanup_source(resolved)

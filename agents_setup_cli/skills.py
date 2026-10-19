@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+import json
 import shutil
 import textwrap
 from dataclasses import dataclass
 from pathlib import Path
 
 from .paths import DEFAULT_PREFIX
+
+OWNER_MARKER = ".ipf-skill-owner.json"
+OWNER_ID = "iPFSoftwares/skills"
 
 
 BUNDLES: dict[str, set[str]] = {
@@ -29,6 +33,12 @@ class Skill:
 
     def target(self, dest_dir: Path) -> Path:
         return dest_dir / self.destination_name
+
+
+@dataclass(frozen=True)
+class SkillResult:
+    message: str
+    changed: bool
 
 
 def find_skill_dirs(source: Path) -> list[Path]:
@@ -188,12 +198,32 @@ def rewrite_installed_name(target: Path, name: str) -> None:
     raise RuntimeError(f"Missing frontmatter name in {skill_file}")
 
 
-def install_skill(skill: Skill, dest_dir: Path, replace: bool, dry_run: bool) -> str:
+def is_owned_canonical(target: Path, name: str) -> bool:
+    if target.is_symlink() or not target.is_dir():
+        return False
+    marker = target / OWNER_MARKER
+    if marker.is_symlink() or not marker.is_file():
+        return False
+    try:
+        owner = json.loads(marker.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return False
+    return owner == {"owner": OWNER_ID, "name": name}
+
+
+def mark_owned_canonical(target: Path, name: str) -> None:
+    (target / OWNER_MARKER).write_text(
+        json.dumps({"owner": OWNER_ID, "name": name}, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
+def install_skill(skill: Skill, dest_dir: Path, replace: bool, dry_run: bool) -> SkillResult:
     target = skill.target(dest_dir)
     if target.exists() or target.is_symlink():
         if not replace:
-            return f"skip    {target.name} already exists"
-        if skill.exact_install_name and read_frontmatter_scalar(target, "install_name") != skill.destination_name:
+            return SkillResult(f"skip    {target.name} already exists", False)
+        if skill.exact_install_name and not is_owned_canonical(target, skill.destination_name):
             raise SystemExit(
                 f"Refusing to replace unmanaged canonical skill: {target}. "
                 "Remove or rename it explicitly, then retry."
@@ -203,24 +233,32 @@ def install_skill(skill: Skill, dest_dir: Path, replace: bool, dry_run: bool) ->
 
     if dry_run:
         prefix = "replace" if target.exists() or target.is_symlink() else "copy"
-        return f"{prefix:<7} {skill.source_dir} -> {target}"
+        return SkillResult(f"{prefix:<7} {skill.source_dir} -> {target}", False)
 
     shutil.copytree(skill.source_dir, target)
     rewrite_installed_name(target, skill.destination_name)
-    return f"copied  {target.name}"
+    if skill.exact_install_name:
+        mark_owned_canonical(target, skill.destination_name)
+    return SkillResult(f"copied  {target.name}", True)
 
 
-def uninstall_skill(skill: Skill, dest_dir: Path, dry_run: bool) -> str:
+def uninstall_skill(skill: Skill, dest_dir: Path, dry_run: bool) -> SkillResult:
     target = skill.target(dest_dir)
+    if (
+        (target.exists() or target.is_symlink())
+        and skill.exact_install_name
+        and not is_owned_canonical(target, skill.destination_name)
+    ):
+        return SkillResult(f"skip    unmanaged canonical skill: {target}", False)
     if dry_run:
         action = "remove" if target.exists() or target.is_symlink() else "missing"
-        return f"{action:<7} {target}"
+        return SkillResult(f"{action:<7} {target}", False)
 
     if not target.exists() and not target.is_symlink():
-        return f"missing {target.name}"
+        return SkillResult(f"missing {target.name}", False)
 
     remove_existing(target)
-    return f"removed {target.name}"
+    return SkillResult(f"removed {target.name}", True)
 
 
 def group_by_department(skills: list[Skill]) -> dict[str, list[Skill]]:

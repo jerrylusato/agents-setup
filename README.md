@@ -131,7 +131,9 @@ npx @jerrylusato/agents-setup init \
   default, and explicit canonical names declared by trusted skill sources with
   `install_name` frontmatter.
 - Existing unmanaged skills at an exact canonical name are never replaced;
-  remove or rename the conflict explicitly before installing.
+  remove or rename the conflict explicitly before installing. Canonical installs
+  carry `.ipf-skill-owner.json`; update and uninstall verify it before changing
+  that directory.
 - Archive extraction rejects path traversal and link entries.
 - GitHub release downloads use the local `gh` authentication state.
 
