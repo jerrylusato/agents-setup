@@ -56,7 +56,8 @@ Do not add private skill or workflow content to this repository or to npm packag
 1. Bump `package.json` in the feature PR when releasing a new npm version.
 2. Confirm unit tests, launcher smoke tests, and `npm pack --dry-run` pass.
 3. Merge the PR into `main`.
-4. The `Publish` workflow publishes to npm using the `NPM_TOKEN` repository secret.
+4. The `Publish` workflow publishes through npm trusted publishing. Check the
+   [publisher setup](docs/npm-publishing.md) if the first run cannot authenticate.
 
 The publish workflow skips a version that already exists on npm. If a release
 needs a code change, bump the version first; npm versions cannot be overwritten.

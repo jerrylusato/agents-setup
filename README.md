@@ -154,14 +154,9 @@ This repository uses GitHub Flow.
 - Publishing runs on pushes to `main`.
 - The publish workflow skips when the current `package.json` version already exists on npm.
 - Bump `package.json` before merging a release PR.
-
-Required GitHub secret:
-
-```text
-NPM_TOKEN
-```
-
-`NPM_TOKEN` must be able to publish `@jerrylusato/agents-setup`.
+- npm publishing uses a GitHub Actions trusted publisher. Configure the exact
+  package and workflow identity before running it; see
+  [npm publishing](docs/npm-publishing.md).
 
 ## Related private repositories
 
