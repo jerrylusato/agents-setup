@@ -1,7 +1,7 @@
 # Contributing
 
 `agents-setup` is a small public CLI. Keep changes focused, easy to review, and
-safe for machines that do not have the private `ipf-skills` or
+safe for machines that do not have the private `skills` or
 `workflow-contract` repositories cloned.
 
 ## Branch and Release Flow
@@ -33,7 +33,7 @@ For behavior that touches private skills, test with an explicit local source:
 ```bash
 TMP_HOME=$(mktemp -d)
 HOME="$TMP_HOME" node bin/agents-setup.js install \
-  --source /Users/jeremiah/Work/ipf-skills/skills \
+  --source /path/to/skills/skills \
   --bundle shared \
   --all
 ```

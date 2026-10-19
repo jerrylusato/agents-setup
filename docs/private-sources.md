@@ -6,7 +6,7 @@ Basic `agents-setup init` is agent wiring only and does not create `docs/`. Work
 
 ## Skills Release Flow
 
-Skill releases are cut from `ipf-skills` `main` after PR merge.
+Skill releases are cut from `skills` `main` after PR merge.
 
 Skills receive the configured `ipf-` prefix by default. A trusted skill may
 declare an exact `install_name` in its `SKILL.md` frontmatter when it is intended
@@ -14,13 +14,15 @@ to provide a canonical unprefixed user-level standard, such as `commit`. Exact
 names are included in duplicate-name checks before installation. The installer
 refuses to replace an existing unmanaged skill at that name.
 
-1. In the private `ipf-skills` repo, build a release bundle:
+1. In the private `skills` repo, build a release bundle:
 
    ```bash
    python tooling/package_skills_release.py --version <version>
    ```
 
 2. Attach the generated `ipf-skills-<version>.tar.gz` asset to a private GitHub Release.
+   Keep this filename when publishing from `iPFSoftwares/skills`: existing
+   installer versions search for the `ipf-skills-*.tar.gz` pattern.
 3. Publish or update `@jerrylusato/agents-setup` only when installer behavior changes.
 4. Developers run:
 
@@ -52,7 +54,7 @@ Workflow releases are cut from `workflow-contract` `main` after PR merge.
 Use `--source` to avoid touching GitHub during local CLI development:
 
 ```bash
-npx @jerrylusato/agents-setup install --source /Users/jeremiah/Work/ipf-skills/skills --bundle shared --all
+npx @jerrylusato/agents-setup install --source /path/to/skills/skills --bundle shared --all
 ```
 
 ```bash
