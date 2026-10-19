@@ -16,6 +16,7 @@ INSTALL_NAME_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 
 BUNDLES: dict[str, set[str]] = {
     "shared": {"shared"},
+    "devops": {"shared", "devops"},
     "frontend": {"shared", "frontend"},
     "backend": {"shared", "backend"},
     "mobile": {"shared", "mobile"},
