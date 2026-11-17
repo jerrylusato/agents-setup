@@ -87,6 +87,19 @@ npx @jerrylusato/agents-setup doctor [--root <project>] [--source <source>] [--d
 
 Use `--help` on any command for the exact option list.
 
+## Bundles
+
+`--bundle` accepts `shared`, `frontend`, `backend`, `mobile`, `data`, `devops`,
+or `all`. Department bundles include shared skills; `data` selects data
+engineering, and `all` selects the entire library.
+
+```bash
+npx @jerrylusato/agents-setup install --bundle devops --all
+```
+
+This installs shared and DevOps skills without prompts. Omit `--all` to choose
+from the bundle interactively, or add `--dry-run` to preview.
+
 ## Source formats
 
 Skills source formats:
