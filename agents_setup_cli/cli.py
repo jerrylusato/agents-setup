@@ -342,6 +342,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subcommands = parser.add_subparsers(dest="command")
 
+    from .resolve import resolve_command
+
+    resolver = subcommands.add_parser("resolve", help="Materialize checksum-pinned skills without user installation state.")
+    resolver.add_argument("--manifest", type=Path, required=True, help="JSON source pin and exact skill IDs.")
+    resolver.add_argument("--dest", type=Path, required=True, help="New output directory; existing paths are never replaced.")
+    resolver.add_argument("--archive", type=Path, help="Use a local archive matching the pinned checksum.")
+    resolver.set_defaults(func=resolve_command)
+
     init = subcommands.add_parser(
         "init",
         help="Scaffold agent wiring. Docs are created only by installed workflows.",
