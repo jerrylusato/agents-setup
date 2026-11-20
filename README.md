@@ -100,6 +100,12 @@ npx @jerrylusato/agents-setup install --bundle devops --all
 This installs shared and DevOps skills without prompts. Omit `--all` to choose
 from the bundle interactively, or add `--dry-run` to preview.
 
+## Machine resolution
+
+Use `agents-setup resolve --manifest skills.request.json --dest build/resolved`
+for exact, checksum-pinned packages without user installation state. See
+[machine skill resolution](docs/skill-resolution.md) for the request and output contract.
+
 ## Source formats
 
 Skills source formats:
